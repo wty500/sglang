@@ -190,6 +190,8 @@ class TokenizedGenerateReqInput:
     # LoRA related
     lora_path: Optional[str] = None  # None means just use the base model
 
+    # Ignore text ids
+    ignore_ids: Optional[List[List[int]]] = None
 
 @dataclass
 class EmbeddingReqInput:

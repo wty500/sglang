@@ -24,6 +24,7 @@ from typing import Dict, List, Optional
 from sglang.srt.managers.schedule_batch import Req, ScheduleBatch
 from sglang.srt.mem_cache.base_prefix_cache import BasePrefixCache
 from sglang.srt.mem_cache.radix_cache import TreeNode
+import torch
 
 # Clip the estimation of max_new_tokens for the request whose max_new_tokens is very large.
 # This can prevent the server from being too conservative.
@@ -47,9 +48,25 @@ class PolicyScheduler:
         if self.policy in ["lpm", "dfs-weight"]:
             for r in waiting_queue:
                 # NOTE: the prefix_indices must always be aligned with last_node
+                key= r.adjust_max_prefix_ids()
                 r.prefix_indices, r.last_node = self.tree_cache.match_prefix(
-                    rid=r.rid, key=r.adjust_max_prefix_ids()
+                    rid=r.rid, key=key
                 )
+                len_key = min(len(key),len(r.prefix_indices))
+                if r.ignore_ids is not None:
+                    for ids in r.ignore_ids:
+                        len_ids = len(ids)
+                        if len_ids > len_key:
+                            continue
+                        for i in range(len_key - len_ids + 1):
+                            if key[i:i + len_ids] == ids:
+                                # before_slice = r.prefix_indices[:i]
+                                # after_slice = r.prefix_indices[i + len_ids:]  
+                                # r.prefix_indices = torch.cat((before_slice, after_slice))
+                                r.prefix_indices[i:i + len_ids] = 9999
+                                break
+                    # r.prefix=self.tree_cache.re
+                    
             prefix_computed = True
 
         if self.policy == "lpm":

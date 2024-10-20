@@ -40,6 +40,7 @@ class SamplingParams:
         regex: Optional[str] = None,
         n: int = 1,
         json_schema: Optional[str] = None,
+        ignore: Optional[List[str]] = None,
     ) -> None:
         self.temperature = temperature
         self.top_p = top_p
@@ -58,6 +59,7 @@ class SamplingParams:
         self.regex = regex
         self.n = n
         self.json_schema = json_schema
+        self.ignore = ignore
 
         # Process some special cases
         if self.temperature < _SAMPLING_EPS:

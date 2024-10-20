@@ -331,6 +331,7 @@ class ModelTpServer:
                 recv_req.input_text,
                 recv_req.input_ids,
                 lora_path=recv_req.lora_path,
+                ignore_ids=recv_req.ignore_ids,
             )
         else:
             req = Req(recv_req.rid, recv_req.input_text, recv_req.input_ids)

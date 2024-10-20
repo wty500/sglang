@@ -167,6 +167,7 @@ class TokenizerManager:
         index: Optional[int] = None,
         is_cache_for_prefill: Optional[bool] = False,
     ):
+        ignore_ids = None
         if not is_cache_for_prefill:  # The normal case with a single prompt
             not_use_index = index is None
 
@@ -175,6 +176,8 @@ class TokenizerManager:
             if obj.input_ids is None:
                 assert self.tokenizer is not None
                 input_ids = self.tokenizer.encode(input_text)
+                if 'ignore' in obj.sampling_params:
+                    ignore_ids = [self.tokenizer.encode(i) for i in obj.sampling_params['ignore']]
             else:
                 input_ids = obj.input_ids if not_use_index else obj.input_ids[index]
 
@@ -215,6 +218,7 @@ class TokenizerManager:
                     rid = obj.rid[0]
                 if self.tokenizer is not None:
                     input_ids = self.tokenizer.encode(input_text)
+                    ignore_ids = [self.tokenizer.encode(i) for i in sampling_params.ignore]
                 else:
                     assert obj.input_ids is not None
                     input_ids = obj.input_ids
@@ -271,6 +275,7 @@ class TokenizerManager:
                     if isinstance(obj.lora_path, list)
                     else obj.lora_path
                 ),
+                ignore_ids,
             )
         else:  # is embedding
             tokenized_obj = TokenizedEmbeddingReqInput(
