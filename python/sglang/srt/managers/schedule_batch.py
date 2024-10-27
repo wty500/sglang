@@ -183,9 +183,23 @@ class Req:
     def init_next_round_input(self, tree_cache: Optional[BasePrefixCache] = None):
         self.fill_ids = self.origin_input_ids + self.output_ids
         if tree_cache is not None:
+            key= self.adjust_max_prefix_ids()
             self.prefix_indices, self.last_node = tree_cache.match_prefix(
-                rid=self.rid, key=self.adjust_max_prefix_ids()
+                rid=self.rid, key=key
             )
+            len_key = min(len(key),len(self.prefix_indices))
+            if self.ignore_ids is not None:
+                for ids in self.ignore_ids:
+                    len_ids = len(ids)
+                    if len_ids > len_key:
+                        continue
+                    for i in range(len_key - len_ids + 1):
+                        if key[i:i + len_ids] == ids:
+                            # before_slice = r.prefix_indices[:i]
+                            # after_slice = r.prefix_indices[i + len_ids:]  
+                            # r.prefix_indices = torch.cat((before_slice, after_slice))
+                            self.prefix_indices[i:i + len_ids] = 9999
+                            break
         self.extend_input_len = len(self.fill_ids) - len(self.prefix_indices)
 
     def adjust_max_prefix_ids(self):

@@ -64,6 +64,7 @@ class PolicyScheduler:
                                 # after_slice = r.prefix_indices[i + len_ids:]  
                                 # r.prefix_indices = torch.cat((before_slice, after_slice))
                                 r.prefix_indices[i:i + len_ids] = 9999
+                                r.origin_input_ids[i:i + len_ids] = [0] * len_ids
                                 break
                     # r.prefix=self.tree_cache.re
                     
