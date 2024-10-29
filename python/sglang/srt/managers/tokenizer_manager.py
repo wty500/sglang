@@ -177,7 +177,8 @@ class TokenizerManager:
                 assert self.tokenizer is not None
                 input_ids = self.tokenizer.encode(input_text)
                 if 'ignore' in obj.sampling_params:
-                    ignore_ids = [self.tokenizer.encode(i) for i in obj.sampling_params['ignore']]
+                    if obj.sampling_params['ignore'] != None:
+                        ignore_ids = [self.tokenizer.encode(i) for i in obj.sampling_params['ignore']]
             else:
                 input_ids = obj.input_ids if not_use_index else obj.input_ids[index]
 
